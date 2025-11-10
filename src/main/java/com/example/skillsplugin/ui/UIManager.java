@@ -349,15 +349,17 @@ public class UIManager {
         int filledBars = (int) (progress * totalBars);
         
         StringBuilder bar = new StringBuilder();
-        bar.append(skillColor);
         
         for (int i = 0; i < totalBars; i++) {
             if (i < filledBars) {
-                bar.append("█");
-            } else if (i == 0) {
-                bar.append(ChatColor.GRAY);
+                if (i == 0) {
+                    bar.append(skillColor);
+                }
                 bar.append("█");
             } else {
+                if (i == filledBars) {
+                    bar.append(ChatColor.GRAY);
+                }
                 bar.append("█");
             }
         }
