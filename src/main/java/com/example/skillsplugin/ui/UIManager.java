@@ -56,11 +56,13 @@ public class UIManager {
             // Remove any existing boss bar for this player
             removeBossBar(player);
             
-            // Create the boss bar with player name, skill, and level
-            String title = ChatColor.GOLD + "" + ChatColor.BOLD + player.getName() 
-                         + ChatColor.YELLOW + " reached " 
-                         + ChatColor.GOLD + "" + ChatColor.BOLD + skill.name() 
-                         + ChatColor.YELLOW + " Level " + ChatColor.WHITE + newLevel;
+            // Create the boss bar with player name, skill icon, and level
+            ChatColor skillColor = getChatColorForSkill(skill);
+            String skillIcon = getIconForSkill(skill);
+            String title = ChatColor.WHITE + player.getName() 
+                         + ChatColor.GRAY + " reached " 
+                         + skillColor + "" + ChatColor.BOLD + skillIcon + " " + skill.name() 
+                         + ChatColor.YELLOW + " Level " + ChatColor.WHITE + "" + ChatColor.BOLD + newLevel;
             BossBar bossBar = Bukkit.createBossBar(title, getColorForSkill(skill), BarStyle.SOLID);
             bossBar.setProgress(1.0);
             
@@ -127,8 +129,10 @@ public class UIManager {
                 return;
             }
             
+            ChatColor skillColor = getChatColorForSkill(skill);
+            String skillIcon = getIconForSkill(skill);
             String message = ChatColor.GREEN + "+" + String.format("%.1f", amount) + " " 
-                           + ChatColor.GRAY + skill.name() + " XP";
+                           + skillColor + skillIcon + " " + skill.name() + " XP";
             player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, 
                                         net.md_5.bungee.api.chat.TextComponent.fromLegacyText(message));
         } catch (Exception e) {
@@ -202,14 +206,17 @@ public class UIManager {
             double requiredXP = skill.getRequiredExperience();
             double progress = requiredXP > 0 ? currentXP / requiredXP : 0;
             
+            ChatColor skillColor = getChatColorForSkill(type);
+            String skillIcon = getIconForSkill(type);
+            
             player.sendMessage("");
-            player.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "=== " + type.name() + " ===");
+            player.sendMessage(skillColor + "" + ChatColor.BOLD + "=== " + skillIcon + " " + type.name() + " ===");
             player.sendMessage("");
             player.sendMessage(ChatColor.YELLOW + "Level: " + ChatColor.WHITE + level);
             player.sendMessage(ChatColor.YELLOW + "Experience: " + ChatColor.WHITE 
                              + String.format("%.1f", currentXP) + " / " + String.format("%.1f", requiredXP));
             player.sendMessage("");
-            player.sendMessage(ChatColor.YELLOW + "Progress: " + createProgressBar(progress));
+            player.sendMessage(ChatColor.YELLOW + "Progress: " + createProgressBar(progress, skillColor));
             player.sendMessage("");
             
         } catch (Exception e) {
@@ -321,9 +328,11 @@ public class UIManager {
         int level = skill.getLevel();
         double progress = skill.getExperience() / skill.getRequiredExperience();
         
-        String skillName = ChatColor.AQUA + type.name();
+        ChatColor skillColor = getChatColorForSkill(type);
+        String skillIcon = getIconForSkill(type);
+        String skillName = skillColor + "" + ChatColor.BOLD + skillIcon + " " + type.name();
         String levelText = ChatColor.YELLOW + "Lvl " + level;
-        String progressBar = createMiniProgressBar(progress);
+        String progressBar = createMiniProgressBar(progress, skillColor);
         
         return skillName + " " + levelText + " " + progressBar;
     }
@@ -332,14 +341,15 @@ public class UIManager {
      * Creates a visual progress bar for detailed skill display.
      * 
      * @param progress The progress as a decimal (0.0 to 1.0)
+     * @param skillColor The color to use for the filled portion
      * @return A formatted progress bar string
      */
-    private String createProgressBar(double progress) {
+    private String createProgressBar(double progress, ChatColor skillColor) {
         int totalBars = 20;
         int filledBars = (int) (progress * totalBars);
         
         StringBuilder bar = new StringBuilder();
-        bar.append(ChatColor.GREEN);
+        bar.append(skillColor);
         
         for (int i = 0; i < totalBars; i++) {
             if (i < filledBars) {
@@ -361,21 +371,22 @@ public class UIManager {
      * Creates a mini progress bar for skill overview display.
      * 
      * @param progress The progress as a decimal (0.0 to 1.0)
+     * @param skillColor The color to use for the filled portion
      * @return A formatted mini progress bar string
      */
-    private String createMiniProgressBar(double progress) {
+    private String createMiniProgressBar(double progress, ChatColor skillColor) {
         int totalBars = 10;
         int filledBars = (int) (progress * totalBars);
         
         StringBuilder bar = new StringBuilder();
         bar.append(ChatColor.GRAY + "[");
-        bar.append(ChatColor.GREEN);
+        bar.append(skillColor);
         
         for (int i = 0; i < totalBars; i++) {
             if (i < filledBars) {
-                bar.append("|");
+                bar.append("█");
             } else {
-                bar.append(ChatColor.DARK_GRAY + "|");
+                bar.append(ChatColor.DARK_GRAY + "█");
             }
         }
         
@@ -408,6 +419,60 @@ public class UIManager {
                 return BarColor.WHITE;
             default:
                 return BarColor.WHITE;
+        }
+    }
+    
+    /**
+     * Gets the appropriate chat color for a skill type.
+     * 
+     * @param skill The skill type
+     * @return The chat color for this skill
+     */
+    private ChatColor getChatColorForSkill(SkillType skill) {
+        switch (skill) {
+            case MINING:
+                return ChatColor.DARK_AQUA;
+            case WOODCUTTING:
+                return ChatColor.DARK_GREEN;
+            case COMBAT:
+                return ChatColor.RED;
+            case FARMING:
+                return ChatColor.GOLD;
+            case FISHING:
+                return ChatColor.AQUA;
+            case ENCHANTING:
+                return ChatColor.LIGHT_PURPLE;
+            case TRADING:
+                return ChatColor.GREEN;
+            default:
+                return ChatColor.WHITE;
+        }
+    }
+    
+    /**
+     * Gets the appropriate icon/symbol for a skill type.
+     * 
+     * @param skill The skill type
+     * @return The icon string for this skill
+     */
+    private String getIconForSkill(SkillType skill) {
+        switch (skill) {
+            case MINING:
+                return "⛏"; // Pickaxe
+            case WOODCUTTING:
+                return "🪓"; // Axe
+            case COMBAT:
+                return "⚔"; // Sword
+            case FARMING:
+                return "🌾"; // Wheat
+            case FISHING:
+                return "🎣"; // Fishing rod
+            case ENCHANTING:
+                return "✨"; // Sparkles
+            case TRADING:
+                return "💰"; // Money bag
+            default:
+                return "⭐"; // Star
         }
     }
 }
