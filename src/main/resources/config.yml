@@ -1,0 +1,85 @@
+# SkillsPlugin Configuration File
+# This file contains all settings for the skills system
+
+# Experience multipliers per skill
+# Adjust these values to make skills level faster (>1.0) or slower (<1.0)
+experience:
+  mining: 1.0
+  woodcutting: 1.0
+  combat: 1.0
+  farming: 1.0
+  fishing: 1.0
+  enchanting: 1.0
+  trading: 1.0
+
+# Level formula settings
+# Formula: baseXP * (level ^ exponent)
+# Higher base-xp = slower leveling overall
+# Higher exponent = exponential difficulty increase
+leveling:
+  base-xp: 100.0
+  exponent: 1.5
+
+# Skill bonuses configuration
+bonuses:
+  # Set to false to disable all bonuses
+  enabled: true
+  
+  # Mining bonuses
+  mining:
+    # Chance for double drops per level (percentage)
+    double-drop-chance-per-level: 0.5
+  
+  # Woodcutting bonuses
+  woodcutting:
+    # Chance for double drops per level (percentage)
+    double-drop-chance-per-level: 0.5
+  
+  # Combat bonuses
+  combat:
+    # Damage increase per level (percentage)
+    damage-bonus-per-level: 0.5
+  
+  # Farming bonuses
+  farming:
+    # Chance for double crop yield per level (percentage)
+    double-crop-chance-per-level: 0.5
+  
+  # Fishing bonuses
+  fishing:
+    # Chance for treasure per level (percentage)
+    treasure-chance-per-level: 0.3
+  
+  # Enchanting bonuses
+  enchanting:
+    # XP cost reduction per level (percentage)
+    cost-reduction-per-level: 0.5
+  
+  # Trading bonuses
+  trading:
+    # Price discount per level (percentage)
+    discount-per-level: 0.3
+
+# UI settings
+ui:
+  # Duration in seconds for level-up boss bars
+  boss-bar-duration: 5
+  
+  # Show action bar messages when gaining XP
+  show-xp-gain-messages: true
+
+# Enabled skills
+# Remove skills from this list to disable them
+enabled-skills:
+  - MINING
+  - WOODCUTTING
+  - COMBAT
+  - FARMING
+  - FISHING
+  - ENCHANTING
+  - TRADING
+
+# Data storage configuration
+storage:
+  # Storage type: JSON or SQLITE
+  type: JSON
