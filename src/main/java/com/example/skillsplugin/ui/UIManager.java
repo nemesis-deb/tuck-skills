@@ -38,7 +38,8 @@ public class UIManager {
     
     /**
      * Displays a boss bar to celebrate a skill level-up.
-     * The boss bar automatically removes itself after the configured duration.
+     * The boss bar is shown to all online players and automatically removes itself after 5 seconds.
+     * The boss bar health decreases smoothly over the duration.
      * 
      * @param player The player who leveled up
      * @param skill The skill type that leveled up
@@ -55,27 +56,55 @@ public class UIManager {
             // Remove any existing boss bar for this player
             removeBossBar(player);
             
-            // Create the boss bar with skill name and level
-            String title = ChatColor.GOLD + "" + ChatColor.BOLD + skill.name() + " LEVEL UP! " 
-                         + ChatColor.YELLOW + "Level " + newLevel;
+            // Create the boss bar with player name, skill, and level
+            String title = ChatColor.GOLD + "" + ChatColor.BOLD + player.getName() 
+                         + ChatColor.YELLOW + " reached " 
+                         + ChatColor.GOLD + "" + ChatColor.BOLD + skill.name() 
+                         + ChatColor.YELLOW + " Level " + ChatColor.WHITE + newLevel;
             BossBar bossBar = Bukkit.createBossBar(title, getColorForSkill(skill), BarStyle.SOLID);
             bossBar.setProgress(1.0);
-            bossBar.addPlayer(player);
+            
+            // Add all online players to see the boss bar
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                bossBar.addPlayer(onlinePlayer);
+            }
             
             // Store the boss bar
             activeBossBars.put(playerId, bossBar);
             
-            // Schedule removal after configured duration (default 5 seconds = 100 ticks)
+            // Schedule boss bar health decrease every tick (5 seconds = 100 ticks)
+            final int totalTicks = 100;
             int taskId = new BukkitRunnable() {
+                int ticksElapsed = 0;
+                
                 @Override
                 public void run() {
                     try {
-                        removeBossBar(player);
+                        ticksElapsed++;
+                        
+                        // Calculate remaining progress (decreases from 1.0 to 0.0)
+                        double progress = 1.0 - ((double) ticksElapsed / totalTicks);
+                        
+                        if (progress <= 0 || ticksElapsed >= totalTicks) {
+                            // Time's up, remove the boss bar
+                            removeBossBar(player);
+                            this.cancel();
+                        } else {
+                            // Update boss bar progress
+                            BossBar bar = activeBossBars.get(playerId);
+                            if (bar != null) {
+                                bar.setProgress(Math.max(0.0, progress));
+                            } else {
+                                // Boss bar was removed externally, cancel task
+                                this.cancel();
+                            }
+                        }
                     } catch (Exception e) {
-                        plugin.getLogger().warning("Error removing boss bar for player " + player.getName() + ": " + e.getMessage());
+                        plugin.getLogger().warning("Error updating boss bar for player " + player.getName() + ": " + e.getMessage());
+                        this.cancel();
                     }
                 }
-            }.runTaskLater(plugin, 100L).getTaskId(); // Use default 100 ticks for now
+            }.runTaskTimer(plugin, 1L, 1L).getTaskId(); // Run every tick starting after 1 tick
             
             // Store task ID for cleanup
             bossBarTaskIds.put(playerId, taskId);
