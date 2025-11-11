@@ -49,17 +49,26 @@ The build process:
 
 ## Commands
 
+**Player Commands:**
 - `/skills` - View all your skills
+- `/skills <player>` - View another player's skills
 - `/skills <skillname>` - View details for a specific skill
+- `/skills <player> <skillname>` - View another player's specific skill
 - `/skills top <skillname>` - View the top 10 players for a specific skill
 - `/skills display <skillname>` - Display your skill level in your name (e.g., `[⛏ 15] PlayerName`)
 - `/skills display off` - Remove skill display from your name
-- `/skills reload` - Reload the configuration (requires `skills.reload` permission)
+
+**Admin Commands:**
+- `/skills admin set <player> <skill> <level>` - Set a player's skill level
+- `/skills admin add <player> <skill> <xp>` - Give XP to a player
+- `/skills admin reset <player> [skill]` - Reset a player's skills (all or specific)
+- `/skills reload` - Reload the configuration
 
 ## Permissions
 
 - `skills.use` - Allows using the skills command (default: true)
 - `skills.reload` - Allows reloading the config (default: op)
+- `skills.admin` - Allows using admin commands (default: op)
 
 ## Configuration
 
@@ -91,6 +100,7 @@ The XP required per level is calculated using: `baseXP * (level ^ exponent)`
 - **XP Multipliers**: Adjust XP gain per skill (1.0 = normal, 2.0 = double XP)
 - **Skill Bonuses**: Configure bonus percentages for each skill
 - **UI Settings**: Customize boss bar duration and XP messages
+- **Sound Effects**: Enable/disable sounds, customize level-up and XP gain sounds
 - **Enabled Skills**: Enable/disable specific skills
 
 ## Requirements

@@ -112,6 +112,7 @@ public class SkillsPlugin extends JavaPlugin {
             // Initialize UI manager
             try {
                 uiManager = new UIManager(this);
+                uiManager.setConfigManager(configManager); // Set config manager for sound settings
                 getLogger().log(Level.INFO, "UI manager initialized successfully");
             } catch (Exception e) {
                 getLogger().log(Level.SEVERE, "Failed to initialize UI manager", e);

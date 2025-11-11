@@ -74,6 +74,17 @@ ui:
   
   # Show action bar messages when gaining XP
   show-xp-gain-messages: true
+  
+  # Sound effects
+  sounds:
+    # Enable/disable sound effects
+    enabled: true
+    
+    # Sound to play on level-up
+    level-up: ENTITY_PLAYER_LEVELUP
+    
+    # Sound to play on XP gain (set to "none" to disable)
+    xp-gain: none
 
 # Enabled skills
 # Remove skills from this list to disable them

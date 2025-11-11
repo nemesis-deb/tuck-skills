@@ -24,6 +24,7 @@ public class UIManager {
     private final Plugin plugin;
     private final Map<UUID, BossBar> activeBossBars;
     private final Map<UUID, Integer> bossBarTaskIds; // Track scheduled tasks for cleanup
+    private com.example.skillsplugin.config.ConfigManager configManager;
     
     /**
      * Creates a new UIManager.
@@ -34,6 +35,15 @@ public class UIManager {
         this.plugin = plugin;
         this.activeBossBars = new HashMap<>();
         this.bossBarTaskIds = new HashMap<>();
+    }
+    
+    /**
+     * Sets the config manager for sound settings.
+     * 
+     * @param configManager The config manager
+     */
+    public void setConfigManager(com.example.skillsplugin.config.ConfigManager configManager) {
+        this.configManager = configManager;
     }
     
     /**
@@ -50,6 +60,9 @@ public class UIManager {
             if (player == null || !player.isOnline()) {
                 return;
             }
+            
+            // Play level-up sound
+            playLevelUpSound(player);
             
             UUID playerId = player.getUniqueId();
             
@@ -128,6 +141,9 @@ public class UIManager {
             if (player == null || !player.isOnline()) {
                 return;
             }
+            
+            // Play XP gain sound
+            playXPGainSound(player);
             
             ChatColor skillColor = getChatColorForSkill(skill);
             String skillIcon = getIconForSkill(skill);
@@ -539,6 +555,24 @@ public class UIManager {
     }
     
     /**
+     * Formats a single skill line for public viewing (other players).
+     * 
+     * @param skill The skill to format
+     * @return A formatted string with skill name and level
+     */
+    public String formatSkillLinePublic(Skill skill) {
+        SkillType type = skill.getType();
+        int level = skill.getLevel();
+        
+        ChatColor skillColor = getChatColorForSkill(type);
+        String skillIcon = getIconForSkill(type);
+        String skillName = skillColor + "" + ChatColor.BOLD + skillIcon + " " + type.name();
+        String levelText = ChatColor.YELLOW + "Lvl " + level;
+        
+        return skillName + " " + levelText;
+    }
+    
+    /**
      * Creates a visual progress bar for detailed skill display.
      * 
      * @param progress The progress as a decimal (0.0 to 1.0)
@@ -596,6 +630,60 @@ public class UIManager {
         bar.append(ChatColor.GRAY + "]");
         
         return bar.toString();
+    }
+    
+    /**
+     * Plays the level-up sound for a player.
+     * 
+     * @param player The player to play the sound for
+     */
+    private void playLevelUpSound(Player player) {
+        try {
+            if (configManager == null || !configManager.areSoundsEnabled()) {
+                return;
+            }
+            
+            String soundName = configManager.getLevelUpSound();
+            if (soundName == null || soundName.equalsIgnoreCase("none")) {
+                return;
+            }
+            
+            try {
+                org.bukkit.Sound sound = org.bukkit.Sound.valueOf(soundName);
+                player.playSound(player.getLocation(), sound, 1.0f, 1.0f);
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Invalid level-up sound: " + soundName);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().fine("Error playing level-up sound: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Plays the XP gain sound for a player.
+     * 
+     * @param player The player to play the sound for
+     */
+    private void playXPGainSound(Player player) {
+        try {
+            if (configManager == null || !configManager.areSoundsEnabled()) {
+                return;
+            }
+            
+            String soundName = configManager.getXPGainSound();
+            if (soundName == null || soundName.equalsIgnoreCase("none")) {
+                return;
+            }
+            
+            try {
+                org.bukkit.Sound sound = org.bukkit.Sound.valueOf(soundName);
+                player.playSound(player.getLocation(), sound, 0.5f, 1.2f);
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Invalid XP gain sound: " + soundName);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().fine("Error playing XP gain sound: " + e.getMessage());
+        }
     }
     
     /**

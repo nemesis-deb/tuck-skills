@@ -350,4 +350,37 @@ public class ConfigManager {
     public FileConfiguration getConfig() {
         return config;
     }
+    
+    /**
+     * Checks if sound effects are enabled
+     */
+    public boolean areSoundsEnabled() {
+        try {
+            return config.getBoolean("ui.sounds.enabled", true);
+        } catch (Exception e) {
+            return true;
+        }
+    }
+    
+    /**
+     * Gets the level-up sound name
+     */
+    public String getLevelUpSound() {
+        try {
+            return config.getString("ui.sounds.level-up", "ENTITY_PLAYER_LEVELUP");
+        } catch (Exception e) {
+            return "ENTITY_PLAYER_LEVELUP";
+        }
+    }
+    
+    /**
+     * Gets the XP gain sound name
+     */
+    public String getXPGainSound() {
+        try {
+            return config.getString("ui.sounds.xp-gain", "none");
+        } catch (Exception e) {
+            return "none";
+        }
+    }
 }

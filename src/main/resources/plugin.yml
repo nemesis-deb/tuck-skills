@@ -10,11 +10,16 @@ commands:
     description: View your skills, leaderboards, or display skill level in your name
     usage: |
       /skills - View all skills
+      /skills <player> - View another player's skills
       /skills <skillname> - View specific skill details
+      /skills <player> <skillname> - View another player's specific skill
       /skills top <skillname> - View top 10 players for a skill
       /skills display <skillname> - Display skill level in your name
       /skills display off - Remove skill display from name
       /skills reload - Reload configuration
+      /skills admin set <player> <skill> <level> - Set player's skill level
+      /skills admin add <player> <skill> <xp> - Give XP to player
+      /skills admin reset <player> [skill] - Reset player's skills
     aliases: [skill, sk]
 
 permissions:
@@ -23,4 +28,7 @@ permissions:
     default: true
   skills.reload:
     description: Allows reloading the config
+    default: op
+  skills.admin:
+    description: Allows using admin commands
     default: op
