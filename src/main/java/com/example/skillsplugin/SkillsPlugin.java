@@ -33,6 +33,7 @@ public class SkillsPlugin extends JavaPlugin {
     private SkillEventListener skillEventListener;
     private PlayerConnectionListener playerConnectionListener;
     private SkillsCommand skillsCommand;
+    private int autoSaveTaskId = -1;
 
     @Override
     public void onEnable() {
@@ -160,6 +161,25 @@ public class SkillsPlugin extends JavaPlugin {
                 getLogger().log(Level.WARNING, "Plugin will continue without command support");
             }
             
+            // Start auto-save task (every 5 minutes = 6000 ticks)
+            try {
+                autoSaveTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            getLogger().log(Level.INFO, "Running auto-save for all player profiles...");
+                            playerDataManager.saveAllProfiles();
+                            getLogger().log(Level.INFO, "Auto-save completed successfully");
+                        } catch (Exception e) {
+                            getLogger().log(Level.SEVERE, "Error during auto-save", e);
+                        }
+                    }
+                }, 6000L, 6000L); // Start after 5 minutes, repeat every 5 minutes
+                getLogger().log(Level.INFO, "Auto-save task started (every 5 minutes)");
+            } catch (Exception e) {
+                getLogger().log(Level.WARNING, "Failed to start auto-save task - data will only be saved on player quit and server shutdown", e);
+            }
+            
             getLogger().log(Level.INFO, "SkillsPlugin has been enabled successfully!");
             
         } catch (Exception e) {
@@ -173,6 +193,16 @@ public class SkillsPlugin extends JavaPlugin {
     public void onDisable() {
         try {
             getLogger().log(Level.INFO, "SkillsPlugin is disabling...");
+            
+            // Cancel auto-save task
+            if (autoSaveTaskId != -1) {
+                try {
+                    getServer().getScheduler().cancelTask(autoSaveTaskId);
+                    getLogger().log(Level.INFO, "Auto-save task cancelled");
+                } catch (Exception e) {
+                    getLogger().log(Level.WARNING, "Error cancelling auto-save task", e);
+                }
+            }
             
             // Save all cached player profiles
             if (playerDataManager != null) {

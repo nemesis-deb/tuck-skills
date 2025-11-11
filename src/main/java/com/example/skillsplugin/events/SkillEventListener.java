@@ -292,6 +292,7 @@ public class SkillEventListener implements Listener {
     /**
      * Awards experience to a player and triggers UI feedback.
      * Handles both XP gain messages and level-up notifications.
+     * Saves player data after level-ups to prevent data loss.
      * 
      * @param player The player to award XP to
      * @param skillType The skill type to award XP for
@@ -309,6 +310,10 @@ public class SkillEventListener implements Listener {
             SkillProfile profile = playerDataManager.getProfile(player.getUniqueId());
             int newLevel = profile.getSkill(skillType).getLevel();
             uiManager.showLevelUpBossBar(player, skillType, newLevel);
+            
+            // Save player data immediately after level-up to prevent data loss
+            playerDataManager.saveProfile(player.getUniqueId());
+            logger.log(Level.FINE, "Saved profile for player " + player.getName() + " after leveling up " + skillType);
         }
     }
     
