@@ -82,18 +82,16 @@ public class SkillEventListener implements Listener {
             Block block = event.getBlock();
             Material material = block.getType();
             
-            // Check for Mining XP (most common, check first)
+            // Mining and Woodcutting XP is now handled by EntityPickupItemEvent
+            // to support veinminer datapacks. Only apply bonuses here.
             double miningXP = experienceCalculator.calculateMiningXP(material);
             if (miningXP > 0) {
-                awardExperienceAndNotify(player, SkillType.MINING, miningXP);
                 bonusManager.applyMiningBonus(player, block);
                 return; // Only award one skill type per action
             }
             
-            // Check for Woodcutting XP
             double woodcuttingXP = experienceCalculator.calculateWoodcuttingXP(material);
             if (woodcuttingXP > 0) {
-                awardExperienceAndNotify(player, SkillType.WOODCUTTING, woodcuttingXP);
                 bonusManager.applyWoodcuttingBonus(player, block);
                 return;
             }
@@ -314,6 +312,7 @@ public class SkillEventListener implements Listener {
             double miningXPPerItem = experienceCalculator.calculateMiningXP(material);
             if (miningXPPerItem > 0) {
                 double totalXP = miningXPPerItem * amount;
+                logger.info("PICKUP: " + player.getName() + " picked up " + amount + "x " + material + " = " + totalXP + " XP (per item: " + miningXPPerItem + ")");
                 awardExperienceAndNotify(player, SkillType.MINING, totalXP);
                 return;
             }
