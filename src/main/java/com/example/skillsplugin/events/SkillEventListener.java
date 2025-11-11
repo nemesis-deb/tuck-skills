@@ -18,6 +18,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerFishEvent;
@@ -286,6 +287,47 @@ public class SkillEventListener implements Listener {
             
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error handling inventory click event for trading", e);
+        }
+    }
+    
+    /**
+     * Handles item pickup events for Mining and Woodcutting skills.
+     * Awards XP based on items picked up - this works with veinminer datapacks
+     * that break blocks without firing BlockBreakEvent.
+     * 
+     * @param event The entity pickup item event
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onItemPickup(EntityPickupItemEvent event) {
+        try {
+            // Only handle player pickups
+            if (!(event.getEntity() instanceof Player)) {
+                return;
+            }
+            
+            Player player = (Player) event.getEntity();
+            ItemStack item = event.getItem().getItemStack();
+            Material material = item.getType();
+            int amount = item.getAmount();
+            
+            // Check for Mining XP from ore drops
+            double miningXPPerItem = experienceCalculator.calculateMiningXP(material);
+            if (miningXPPerItem > 0) {
+                double totalXP = miningXPPerItem * amount;
+                awardExperienceAndNotify(player, SkillType.MINING, totalXP);
+                return;
+            }
+            
+            // Check for Woodcutting XP from log drops
+            double woodcuttingXPPerItem = experienceCalculator.calculateWoodcuttingXP(material);
+            if (woodcuttingXPPerItem > 0) {
+                double totalXP = woodcuttingXPPerItem * amount;
+                awardExperienceAndNotify(player, SkillType.WOODCUTTING, totalXP);
+                return;
+            }
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error handling item pickup event", e);
         }
     }
     
