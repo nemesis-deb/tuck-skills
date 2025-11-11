@@ -34,16 +34,16 @@ public class SkillTest {
     
     @Test
     public void testRequiredExperienceCalculation() {
-        // Level 1: 100 * (1 ^ 1.5) = 100
+        // Level 1: 100 * (1 ^ 1.25) = 100
         assertEquals("Level 1 should require 100 XP", 100.0, skill.getRequiredExperience(), 0.001);
         
         skill.setLevel(2);
-        // Level 2: 100 * (2 ^ 1.5) = 282.84
-        assertEquals("Level 2 should require ~282.84 XP", 282.84, skill.getRequiredExperience(), 0.01);
+        // Level 2: 100 * (2 ^ 1.25) = 237.84
+        assertEquals("Level 2 should require ~237.84 XP", 237.84, skill.getRequiredExperience(), 0.01);
         
         skill.setLevel(5);
-        // Level 5: 100 * (5 ^ 1.5) = 1118.03
-        assertEquals("Level 5 should require ~1118.03 XP", 1118.03, skill.getRequiredExperience(), 0.01);
+        // Level 5: 100 * (5 ^ 1.25) = 843.90
+        assertEquals("Level 5 should require ~843.90 XP", 843.90, skill.getRequiredExperience(), 0.01);
     }
     
     @Test

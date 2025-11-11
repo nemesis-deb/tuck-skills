@@ -65,7 +65,7 @@ public class ConfigManagerTest {
         
         // Leveling formula
         testConfig.set("leveling.base-xp", 100.0);
-        testConfig.set("leveling.exponent", 1.5);
+        testConfig.set("leveling.exponent", 1.25);
         
         // Bonuses
         testConfig.set("bonuses.enabled", true);
@@ -143,7 +143,7 @@ public class ConfigManagerTest {
         configManager.loadConfig();
         
         assertEquals("Base XP should be 100.0", 100.0, configManager.getBaseXP(), 0.001);
-        assertEquals("Exponent should be 1.5", 1.5, configManager.getExponent(), 0.001);
+        assertEquals("Exponent should be 1.25", 1.25, configManager.getExponent(), 0.001);
     }
     
     @Test
@@ -318,8 +318,8 @@ public class ConfigManagerTest {
             1.0, configManager.getExperienceMultiplier(SkillType.MINING), 0.001);
         assertEquals("Missing base XP should default to 100.0", 
             100.0, configManager.getBaseXP(), 0.001);
-        assertEquals("Missing exponent should default to 1.5", 
-            1.5, configManager.getExponent(), 0.001);
+        assertEquals("Missing exponent should default to 1.25", 
+            1.25, configManager.getExponent(), 0.001);
         assertTrue("Missing bonuses enabled should default to true", 
             configManager.areBonusesEnabled());
         assertEquals("Missing boss bar duration should default to 5", 

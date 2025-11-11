@@ -148,10 +148,10 @@ public class ExperienceCalculatorTest {
     
     @Test
     public void testCalculateWoodcuttingXP_WithMultiplier() {
-        when(configManager.getExperienceMultiplier(SkillType.WOODCUTTING)).thenReturn(1.5);
+        when(configManager.getExperienceMultiplier(SkillType.WOODCUTTING)).thenReturn(1.25);
         
         double xp = calculator.calculateWoodcuttingXP(Material.DARK_OAK_LOG);
-        assertEquals(12.0, xp, 0.01); // 8.0 * 1.5
+        assertEquals(10.0, xp, 0.01); // 8.0 * 1.25
     }
     
     // ========== Combat XP Tests ==========
@@ -335,11 +335,11 @@ public class ExperienceCalculatorTest {
     
     @Test
     public void testCalculateFishingXP_WithMultiplier() {
-        when(configManager.getExperienceMultiplier(SkillType.FISHING)).thenReturn(1.5);
+        when(configManager.getExperienceMultiplier(SkillType.FISHING)).thenReturn(1.25);
         
         ItemStack cod = new ItemStack(Material.COD);
         double xp = calculator.calculateFishingXP(cod);
-        assertEquals(15.0, xp, 0.01); // 10.0 * 1.5
+        assertEquals(12.5, xp, 0.01); // 10.0 * 1.25
     }
     
     // ========== Enchanting XP Tests ==========
@@ -442,14 +442,14 @@ public class ExperienceCalculatorTest {
     
     @Test
     public void testCalculateTradingXP_WithMultiplier() {
-        when(configManager.getExperienceMultiplier(SkillType.TRADING)).thenReturn(1.5);
+        when(configManager.getExperienceMultiplier(SkillType.TRADING)).thenReturn(1.25);
         
         MerchantRecipe trade = mock(MerchantRecipe.class);
         ItemStack result = new ItemStack(Material.DIAMOND, 1);
         when(trade.getResult()).thenReturn(result);
         
         double xp = calculator.calculateTradingXP(trade);
-        assertEquals(45.0, xp, 0.01); // 30.0 * 1.5
+        assertEquals(37.5, xp, 0.01); // 30.0 * 1.25
     }
     
     // ========== Config Multiplier Integration Tests ==========
@@ -457,7 +457,7 @@ public class ExperienceCalculatorTest {
     @Test
     public void testAllSkillsWithDifferentMultipliers() {
         when(configManager.getExperienceMultiplier(SkillType.MINING)).thenReturn(2.0);
-        when(configManager.getExperienceMultiplier(SkillType.WOODCUTTING)).thenReturn(1.5);
+        when(configManager.getExperienceMultiplier(SkillType.WOODCUTTING)).thenReturn(1.25);
         when(configManager.getExperienceMultiplier(SkillType.COMBAT)).thenReturn(3.0);
         when(configManager.getExperienceMultiplier(SkillType.FARMING)).thenReturn(1.2);
         when(configManager.getExperienceMultiplier(SkillType.FISHING)).thenReturn(0.8);
@@ -465,7 +465,7 @@ public class ExperienceCalculatorTest {
         when(configManager.getExperienceMultiplier(SkillType.TRADING)).thenReturn(1.1);
         
         assertEquals(50.0, calculator.calculateMiningXP(Material.DIAMOND_ORE), 0.01);
-        assertEquals(12.0, calculator.calculateWoodcuttingXP(Material.DARK_OAK_LOG), 0.01);
+        assertEquals(10.0, calculator.calculateWoodcuttingXP(Material.DARK_OAK_LOG), 0.01);
         assertEquals(30.0, calculator.calculateCombatXP(EntityType.ZOMBIE), 0.01);
         assertEquals(6.0, calculator.calculateFarmingXP(Material.WHEAT), 0.01);
         

@@ -23,37 +23,37 @@ public class LevelFormulaTest {
     
     @Test
     public void testDefaultFormulaLevel1() {
-        // Level 1: 100 * (1 ^ 1.5) = 100
+        // Level 1: 100 * (1 ^ 1.25) = 100
         double required = defaultFormula.getRequiredExperience(1);
         assertEquals("Level 1 should require 100 XP", 100.0, required, 0.001);
     }
     
     @Test
     public void testDefaultFormulaLevel2() {
-        // Level 2: 100 * (2 ^ 1.5) = 282.84
+        // Level 2: 100 * (2 ^ 1.25) = 237.84
         double required = defaultFormula.getRequiredExperience(2);
-        assertEquals("Level 2 should require ~282.84 XP", 282.84, required, 0.01);
+        assertEquals("Level 2 should require ~237.84 XP", 237.84, required, 0.01);
     }
     
     @Test
     public void testDefaultFormulaLevel5() {
-        // Level 5: 100 * (5 ^ 1.5) = 1118.03
+        // Level 5: 100 * (5 ^ 1.25) = 843.90
         double required = defaultFormula.getRequiredExperience(5);
-        assertEquals("Level 5 should require ~1118.03 XP", 1118.03, required, 0.01);
+        assertEquals("Level 5 should require ~843.90 XP", 843.90, required, 0.01);
     }
     
     @Test
     public void testDefaultFormulaLevel10() {
-        // Level 10: 100 * (10 ^ 1.5) = 3162.28
+        // Level 10: 100 * (10 ^ 1.25) = 2371.37
         double required = defaultFormula.getRequiredExperience(10);
-        assertEquals("Level 10 should require ~3162.28 XP", 3162.28, required, 0.01);
+        assertEquals("Level 10 should require ~2371.37 XP", 2371.37, required, 0.01);
     }
     
     @Test
     public void testDefaultFormulaLevel50() {
-        // Level 50: 100 * (50 ^ 1.5) = 35355.34
+        // Level 50: 100 * (50 ^ 1.25) = 26265.28
         double required = defaultFormula.getRequiredExperience(50);
-        assertEquals("Level 50 should require ~35355.34 XP", 35355.34, required, 0.01);
+        assertEquals("Level 50 should require ~26265.28 XP", 26265.28, required, 0.01);
     }
     
     @Test
@@ -147,30 +147,30 @@ public class LevelFormulaTest {
     public void testLowBaseXP() {
         // Test with very low base XP
         when(mockConfig.getBaseXP()).thenReturn(10.0);
-        when(mockConfig.getExponent()).thenReturn(1.5);
+        when(mockConfig.getExponent()).thenReturn(1.25);
         
         LevelFormula lowBaseFormula = new LevelFormula(mockConfig);
         
-        // Level 1: 10 * (1 ^ 1.5) = 10
+        // Level 1: 10 * (1 ^ 1.25) = 10
         assertEquals("Low base level 1", 10.0, lowBaseFormula.getRequiredExperience(1), 0.001);
         
-        // Level 10: 10 * (10 ^ 1.5) = 316.23
-        assertEquals("Low base level 10", 316.23, lowBaseFormula.getRequiredExperience(10), 0.01);
+        // Level 10: 10 * (10 ^ 1.25) = 237.14
+        assertEquals("Low base level 10", 237.14, lowBaseFormula.getRequiredExperience(10), 0.01);
     }
     
     @Test
     public void testHighBaseXP() {
         // Test with very high base XP
         when(mockConfig.getBaseXP()).thenReturn(1000.0);
-        when(mockConfig.getExponent()).thenReturn(1.5);
+        when(mockConfig.getExponent()).thenReturn(1.25);
         
         LevelFormula highBaseFormula = new LevelFormula(mockConfig);
         
-        // Level 1: 1000 * (1 ^ 1.5) = 1000
+        // Level 1: 1000 * (1 ^ 1.25) = 1000
         assertEquals("High base level 1", 1000.0, highBaseFormula.getRequiredExperience(1), 0.001);
         
-        // Level 10: 1000 * (10 ^ 1.5) = 31622.78
-        assertEquals("High base level 10", 31622.78, highBaseFormula.getRequiredExperience(10), 0.01);
+        // Level 10: 1000 * (10 ^ 1.25) = 23713.74
+        assertEquals("High base level 10", 23713.74, highBaseFormula.getRequiredExperience(10), 0.01);
     }
     
     @Test

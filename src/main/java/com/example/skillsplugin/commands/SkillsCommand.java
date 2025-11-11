@@ -44,6 +44,11 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         try {
+            // Handle help subcommand
+            if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
+                return handleHelp(sender);
+            }
+            
             // Handle reload subcommand
             if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
                 return handleReload(sender);
@@ -146,6 +151,48 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
             e.printStackTrace();
             return true;
         }
+    }
+    
+    /**
+     * Handles the /skills help subcommand.
+     * Displays all available commands and their usage.
+     * 
+     * @param sender The command sender
+     * @return true if the command was handled successfully
+     */
+    private boolean handleHelp(CommandSender sender) {
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "=== Skills Plugin Help ===");
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.YELLOW + "Player Commands:");
+        sender.sendMessage(ChatColor.GRAY + "  /skills" + ChatColor.WHITE + " - View all your skills");
+        sender.sendMessage(ChatColor.GRAY + "  /skills <player>" + ChatColor.WHITE + " - View another player's skills");
+        sender.sendMessage(ChatColor.GRAY + "  /skills <skillname>" + ChatColor.WHITE + " - View details for a specific skill");
+        sender.sendMessage(ChatColor.GRAY + "  /skills <player> <skillname>" + ChatColor.WHITE + " - View another player's specific skill");
+        sender.sendMessage(ChatColor.GRAY + "  /skills top <skillname>" + ChatColor.WHITE + " - View top 10 players for a skill");
+        sender.sendMessage(ChatColor.GRAY + "  /skills display <skillname>" + ChatColor.WHITE + " - Display skill level in your name");
+        sender.sendMessage(ChatColor.GRAY + "  /skills display off" + ChatColor.WHITE + " - Remove skill display from your name");
+        sender.sendMessage(ChatColor.GRAY + "  /skills help" + ChatColor.WHITE + " - Show this help message");
+        sender.sendMessage("");
+        
+        if (sender.hasPermission("skills.admin")) {
+            sender.sendMessage(ChatColor.YELLOW + "Admin Commands:");
+            sender.sendMessage(ChatColor.GRAY + "  /skills admin set <player> <skill> <level>" + ChatColor.WHITE + " - Set a player's skill level");
+            sender.sendMessage(ChatColor.GRAY + "  /skills admin add <player> <skill> <xp>" + ChatColor.WHITE + " - Give XP to a player");
+            sender.sendMessage(ChatColor.GRAY + "  /skills admin reset <player> [skill]" + ChatColor.WHITE + " - Reset player's skills");
+            sender.sendMessage("");
+        }
+        
+        if (sender.hasPermission("skills.reload")) {
+            sender.sendMessage(ChatColor.YELLOW + "Config Commands:");
+            sender.sendMessage(ChatColor.GRAY + "  /skills reload" + ChatColor.WHITE + " - Reload the configuration");
+            sender.sendMessage("");
+        }
+        
+        sender.sendMessage(ChatColor.GRAY + "Available Skills: " + ChatColor.WHITE + getSkillNamesList());
+        sender.sendMessage("");
+        
+        return true;
     }
     
     /**
@@ -550,6 +597,7 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
                 // Add subcommands
                 completions.add("display");
                 completions.add("top");
+                completions.add("help");
                 
                 // Add online player names
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
