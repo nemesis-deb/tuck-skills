@@ -311,6 +311,9 @@ public class SkillEventListener implements Listener {
             int newLevel = profile.getSkill(skillType).getLevel();
             uiManager.showLevelUpBossBar(player, skillType, newLevel);
             
+            // Update display name if this skill is currently displayed
+            uiManager.updateDisplayNameIfNeeded(player, profile, skillType);
+            
             // Save player data immediately after level-up to prevent data loss
             playerDataManager.saveProfile(player.getUniqueId());
             logger.log(Level.FINE, "Saved profile for player " + player.getName() + " after leveling up " + skillType);

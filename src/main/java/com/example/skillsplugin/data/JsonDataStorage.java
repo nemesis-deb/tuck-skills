@@ -83,6 +83,11 @@ public class JsonDataStorage implements DataStorage {
             }
             root.add("skills", skillsJson);
             
+            // Add displayed skill preference
+            if (profile.getDisplayedSkill() != null) {
+                root.addProperty("displayedSkill", profile.getDisplayedSkill().name());
+            }
+            
             // Add timestamp
             root.addProperty("lastUpdated", System.currentTimeMillis());
             
@@ -224,7 +229,21 @@ public class JsonDataStorage implements DataStorage {
                 }
             }
             
-            return new SkillProfile(loadedPlayerId, skills);
+            // Create profile
+            SkillProfile profile = new SkillProfile(loadedPlayerId, skills);
+            
+            // Load displayed skill preference
+            if (root.has("displayedSkill")) {
+                try {
+                    String displayedSkillName = root.get("displayedSkill").getAsString();
+                    SkillType displayedSkill = SkillType.valueOf(displayedSkillName);
+                    profile.setDisplayedSkill(displayedSkill);
+                } catch (Exception e) {
+                    // If parsing fails, just leave it as null
+                }
+            }
+            
+            return profile;
             
         } catch (IOException e) {
             throw new DataStorageException("Failed to load player data for " + playerId + (isBackup ? " from backup" : ""), e);

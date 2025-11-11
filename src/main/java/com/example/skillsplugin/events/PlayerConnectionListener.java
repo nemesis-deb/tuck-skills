@@ -40,6 +40,7 @@ public class PlayerConnectionListener implements Listener {
     /**
      * Handles player join events.
      * Loads the player's skill profile from storage or creates a new one for first-time players.
+     * Restores the player's display name if they had a skill displayed.
      * 
      * @param event The player join event
      */
@@ -60,6 +61,9 @@ public class PlayerConnectionListener implements Listener {
                 // Profile is automatically initialized with default skills in SkillProfile constructor
             } else {
                 logger.log(Level.INFO, "Player joined: " + player.getName() + " (" + playerId + ")");
+                
+                // Restore display name if they had a skill displayed
+                uiManager.restoreDisplayName(player, profile);
             }
             
         } catch (Exception e) {

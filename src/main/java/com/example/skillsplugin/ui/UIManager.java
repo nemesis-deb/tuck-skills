@@ -186,11 +186,13 @@ public class UIManager {
     /**
      * Sets the player's display name to show their skill level.
      * Format: [icon level] PlayerName
+     * Also saves the preference in the player's profile.
      * 
      * @param player The player whose display name to update
      * @param skill The skill to display
+     * @param profile The player's skill profile to save the preference
      */
-    public void setSkillDisplayName(Player player, Skill skill) {
+    public void setSkillDisplayName(Player player, Skill skill, SkillProfile profile) {
         try {
             if (player == null || !player.isOnline()) {
                 return;
@@ -213,8 +215,93 @@ public class UIManager {
             player.setDisplayName(displayName);
             player.setPlayerListName(displayName);
             
+            // Save the preference in the profile
+            if (profile != null) {
+                profile.setDisplayedSkill(type);
+            }
+            
         } catch (Exception e) {
             plugin.getLogger().warning("Error setting skill display name for player " + player.getName() + ": " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Removes the skill display from a player's name and clears the preference.
+     * 
+     * @param player The player whose display name to reset
+     * @param profile The player's skill profile to clear the preference
+     */
+    public void removeSkillDisplayName(Player player, SkillProfile profile) {
+        try {
+            if (player == null || !player.isOnline()) {
+                return;
+            }
+            
+            player.setDisplayName(player.getName());
+            player.setPlayerListName(player.getName());
+            
+            // Clear the preference in the profile
+            if (profile != null) {
+                profile.setDisplayedSkill(null);
+            }
+            
+        } catch (Exception e) {
+            plugin.getLogger().warning("Error removing skill display name for player " + player.getName() + ": " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Restores a player's display name based on their saved preference.
+     * Called on player join to restore their chosen skill display.
+     * 
+     * @param player The player whose display name to restore
+     * @param profile The player's skill profile containing the preference
+     */
+    public void restoreDisplayName(Player player, SkillProfile profile) {
+        try {
+            if (player == null || !player.isOnline() || profile == null) {
+                return;
+            }
+            
+            SkillType displayedSkill = profile.getDisplayedSkill();
+            if (displayedSkill != null) {
+                Skill skill = profile.getSkill(displayedSkill);
+                if (skill != null) {
+                    setSkillDisplayName(player, skill, profile);
+                    plugin.getLogger().fine("Restored display name for player " + player.getName() + " with " + displayedSkill);
+                }
+            }
+            
+        } catch (Exception e) {
+            plugin.getLogger().warning("Error restoring display name for player " + player.getName() + ": " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Updates a player's display name if they have a skill displayed and it leveled up.
+     * Called after a level-up to keep the display name current.
+     * 
+     * @param player The player whose display name to update
+     * @param profile The player's skill profile
+     * @param leveledUpSkill The skill that just leveled up
+     */
+    public void updateDisplayNameIfNeeded(Player player, SkillProfile profile, SkillType leveledUpSkill) {
+        try {
+            if (player == null || !player.isOnline() || profile == null) {
+                return;
+            }
+            
+            SkillType displayedSkill = profile.getDisplayedSkill();
+            if (displayedSkill != null && displayedSkill == leveledUpSkill) {
+                Skill skill = profile.getSkill(displayedSkill);
+                if (skill != null) {
+                    setSkillDisplayName(player, skill, profile);
+                    plugin.getLogger().fine("Updated display name for player " + player.getName() + " after leveling up " + leveledUpSkill);
+                }
+            }
+            
+        } catch (Exception e) {
+            plugin.getLogger().warning("Error updating display name for player " + player.getName() + ": " + e.getMessage());
         }
     }
     

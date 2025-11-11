@@ -12,6 +12,7 @@ public class SkillProfile {
     private final UUID playerId;
     private final Map<SkillType, Skill> skills;
     private boolean isNew;
+    private SkillType displayedSkill; // The skill currently displayed in player's name
     
     /**
      * Creates a new skill profile for a player with all skills initialized at level 1.
@@ -97,5 +98,23 @@ public class SkillProfile {
      */
     public void markAsExisting() {
         this.isNew = false;
+    }
+    
+    /**
+     * Gets the skill type currently displayed in the player's name.
+     * 
+     * @return The displayed skill type, or null if no skill is displayed
+     */
+    public SkillType getDisplayedSkill() {
+        return displayedSkill;
+    }
+    
+    /**
+     * Sets the skill type to display in the player's name.
+     * 
+     * @param skillType The skill type to display, or null to remove display
+     */
+    public void setDisplayedSkill(SkillType skillType) {
+        this.displayedSkill = skillType;
     }
 }

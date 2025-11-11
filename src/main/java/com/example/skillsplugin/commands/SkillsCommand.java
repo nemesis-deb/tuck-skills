@@ -166,14 +166,6 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
      */
     private boolean handleDisplay(Player player, String skillArg) {
         try {
-            // Handle /skills display off
-            if (skillArg.equalsIgnoreCase("off") || skillArg.equalsIgnoreCase("none")) {
-                player.setDisplayName(player.getName());
-                player.setPlayerListName(player.getName());
-                player.sendMessage(ChatColor.GREEN + "Skill display removed from your name.");
-                return true;
-            }
-            
             // Get player's skill profile
             SkillProfile profile;
             try {
@@ -188,6 +180,14 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             
+            // Handle /skills display off
+            if (skillArg.equalsIgnoreCase("off") || skillArg.equalsIgnoreCase("none")) {
+                uiManager.removeSkillDisplayName(player, profile);
+                playerDataManager.saveProfile(player.getUniqueId()); // Save the preference
+                player.sendMessage(ChatColor.GREEN + "Skill display removed from your name.");
+                return true;
+            }
+            
             // Parse skill type
             String skillName = skillArg.toUpperCase();
             try {
@@ -199,8 +199,9 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 
-                // Update display name with skill badge
-                uiManager.setSkillDisplayName(player, skill);
+                // Update display name with skill badge and save preference
+                uiManager.setSkillDisplayName(player, skill, profile);
+                playerDataManager.saveProfile(player.getUniqueId()); // Save the preference
                 player.sendMessage(ChatColor.GREEN + "Your name now displays your " + skillType.name() + " level!");
                 return true;
                 
