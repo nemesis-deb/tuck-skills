@@ -27,6 +27,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +47,10 @@ public class SkillEventListener implements Listener {
     private final UIManager uiManager;
     private final BonusManager bonusManager;
     private final Logger logger;
+    
+    // Track which blocks gave XP on break to avoid double-counting on pickup
+    private final Map<UUID, Set<Material>> recentBreaks;
+    private static final long BREAK_MEMORY_MS = 2000; // Remember breaks for 2 seconds
     
     /**
      * Creates a new skill event listener.
@@ -62,6 +71,7 @@ public class SkillEventListener implements Listener {
         this.uiManager = uiManager;
         this.bonusManager = bonusManager;
         this.logger = logger;
+        this.recentBreaks = new HashMap<>();
     }
     
     /**
@@ -81,18 +91,27 @@ public class SkillEventListener implements Listener {
             
             Block block = event.getBlock();
             Material material = block.getType();
+            UUID playerId = player.getUniqueId();
             
-            // Mining and Woodcutting XP is now handled by EntityPickupItemEvent
-            // to support veinminer datapacks. Only apply bonuses here.
+            // Check for Mining XP (most common, check first)
             double miningXP = experienceCalculator.calculateMiningXP(material);
             if (miningXP > 0) {
+                logger.info("BREAK: " + player.getName() + " broke " + material + " = " + miningXP + " XP");
+                awardExperienceAndNotify(player, SkillType.MINING, miningXP);
                 bonusManager.applyMiningBonus(player, block);
+                // Remember this break to avoid double XP on pickup
+                recentBreaks.computeIfAbsent(playerId, k -> new HashSet<>()).add(material);
                 return; // Only award one skill type per action
             }
             
+            // Check for Woodcutting XP
             double woodcuttingXP = experienceCalculator.calculateWoodcuttingXP(material);
             if (woodcuttingXP > 0) {
+                logger.info("BREAK: " + player.getName() + " broke " + material + " = " + woodcuttingXP + " XP");
+                awardExperienceAndNotify(player, SkillType.WOODCUTTING, woodcuttingXP);
                 bonusManager.applyWoodcuttingBonus(player, block);
+                // Remember this break to avoid double XP on pickup
+                recentBreaks.computeIfAbsent(playerId, k -> new HashSet<>()).add(material);
                 return;
             }
             
@@ -307,8 +326,17 @@ public class SkillEventListener implements Listener {
             ItemStack item = event.getItem().getItemStack();
             Material material = item.getType();
             int amount = item.getAmount();
+            UUID playerId = player.getUniqueId();
             
-            // Check for Mining XP from ore drops
+            // Check if we recently gave XP for breaking this material (avoid double XP)
+            Set<Material> playerBreaks = recentBreaks.get(playerId);
+            if (playerBreaks != null && playerBreaks.contains(material)) {
+                logger.info("PICKUP SKIP: " + player.getName() + " - already got XP for breaking " + material);
+                playerBreaks.remove(material); // Remove so next pickup counts
+                return;
+            }
+            
+            // Check for Mining XP from ore drops (for veinminer drops that didn't fire BlockBreakEvent)
             double miningXPPerItem = experienceCalculator.calculateMiningXP(material);
             if (miningXPPerItem > 0) {
                 double totalXP = miningXPPerItem * amount;
@@ -321,6 +349,7 @@ public class SkillEventListener implements Listener {
             double woodcuttingXPPerItem = experienceCalculator.calculateWoodcuttingXP(material);
             if (woodcuttingXPPerItem > 0) {
                 double totalXP = woodcuttingXPPerItem * amount;
+                logger.info("PICKUP: " + player.getName() + " picked up " + amount + "x " + material + " = " + totalXP + " XP (per item: " + woodcuttingXPPerItem + ")");
                 awardExperienceAndNotify(player, SkillType.WOODCUTTING, totalXP);
                 return;
             }
