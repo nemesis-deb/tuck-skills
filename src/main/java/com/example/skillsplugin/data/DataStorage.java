@@ -42,4 +42,12 @@ public interface DataStorage {
      * @throws DataStorageException if initialization fails
      */
     void initialize() throws DataStorageException;
+    
+    /**
+     * Gets all player UUIDs that have saved profiles.
+     * 
+     * @return An array of player UUIDs
+     * @throws DataStorageException if the operation fails
+     */
+    UUID[] getAllPlayerIds() throws DataStorageException;
 }

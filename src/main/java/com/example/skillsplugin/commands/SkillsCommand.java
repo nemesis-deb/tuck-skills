@@ -68,6 +68,11 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
                 return handleDisplay(player, args[1]);
             }
             
+            // Handle /skills top <skillname>
+            if (args.length >= 2 && args[0].equalsIgnoreCase("top")) {
+                return handleTop(player, args[1]);
+            }
+            
             // Get player's skill profile
             SkillProfile profile;
             try {
@@ -221,6 +226,42 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
     }
     
     /**
+     * Handles the /skills top <skillname> subcommand.
+     * Displays the top 10 players for a specific skill.
+     * 
+     * @param player The player executing the command
+     * @param skillArg The skill name
+     * @return true if the command was handled successfully
+     */
+    private boolean handleTop(Player player, String skillArg) {
+        try {
+            // Parse skill type
+            String skillName = skillArg.toUpperCase();
+            try {
+                SkillType skillType = SkillType.valueOf(skillName);
+                
+                // Get top 10 players
+                PlayerDataManager.LeaderboardEntry[] entries = playerDataManager.getTopPlayers(skillType, 10);
+                
+                // Display leaderboard
+                uiManager.sendLeaderboard(player, skillType, entries);
+                return true;
+                
+            } catch (IllegalArgumentException e) {
+                player.sendMessage(ChatColor.RED + "Unknown skill: " + skillArg);
+                player.sendMessage(ChatColor.GRAY + "Available skills: " + getSkillNamesList());
+                return true;
+            }
+            
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + "An unexpected error occurred.");
+            plugin.getLogger().severe("Error in top command: " + e.getMessage());
+            e.printStackTrace();
+            return true;
+        }
+    }
+    
+    /**
      * Gets a comma-separated list of all skill names.
      * 
      * @return A string with all skill names
@@ -237,7 +278,7 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
         try {
             List<String> completions = new ArrayList<>();
             
-            // First argument: skill names, "reload", or "display"
+            // First argument: skill names, "reload", "display", or "top"
             if (args.length == 1) {
                 // Add all skill names
                 for (SkillType skillType : SkillType.values()) {
@@ -249,8 +290,9 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
                     completions.add("reload");
                 }
                 
-                // Add display subcommand
+                // Add subcommands
                 completions.add("display");
+                completions.add("top");
                 
                 // Filter based on what the user has typed
                 String input = args[0].toLowerCase();
@@ -268,6 +310,20 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
                 
                 // Add "off" option
                 completions.add("off");
+                
+                // Filter based on what the user has typed
+                String input = args[1].toLowerCase();
+                return completions.stream()
+                        .filter(s -> s.startsWith(input))
+                        .collect(Collectors.toList());
+            }
+            
+            // Second argument for /skills top <skillname>
+            if (args.length == 2 && args[0].equalsIgnoreCase("top")) {
+                // Add all skill names
+                for (SkillType skillType : SkillType.values()) {
+                    completions.add(skillType.name().toLowerCase());
+                }
                 
                 // Filter based on what the user has typed
                 String input = args[1].toLowerCase();

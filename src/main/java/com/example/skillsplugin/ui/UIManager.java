@@ -141,6 +141,85 @@ public class UIManager {
     }
     
     /**
+     * Sends a leaderboard for a specific skill.
+     * 
+     * @param player The player to send the leaderboard to
+     * @param skillType The skill type to show leaderboard for
+     * @param entries The leaderboard entries
+     */
+    public void sendLeaderboard(Player player, SkillType skillType, com.example.skillsplugin.data.PlayerDataManager.LeaderboardEntry[] entries) {
+        try {
+            if (player == null || !player.isOnline()) {
+                return;
+            }
+            
+            ChatColor skillColor = getChatColorForSkill(skillType);
+            String skillIcon = getIconForSkill(skillType);
+            
+            player.sendMessage("");
+            player.sendMessage(skillColor + "" + ChatColor.BOLD + "=== " + skillIcon + " " + skillType.name() + " LEADERBOARD ===");
+            player.sendMessage("");
+            
+            if (entries.length == 0) {
+                player.sendMessage(ChatColor.GRAY + "No players found.");
+                player.sendMessage("");
+                return;
+            }
+            
+            for (int i = 0; i < entries.length; i++) {
+                com.example.skillsplugin.data.PlayerDataManager.LeaderboardEntry entry = entries[i];
+                int rank = i + 1;
+                
+                // Get player name (try to get from online players first, otherwise use UUID)
+                String playerName = null;
+                Player targetPlayer = Bukkit.getPlayer(entry.getPlayerId());
+                if (targetPlayer != null) {
+                    playerName = targetPlayer.getName();
+                } else {
+                    // Try to get from offline player
+                    org.bukkit.OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(entry.getPlayerId());
+                    if (offlinePlayer.hasPlayedBefore()) {
+                        playerName = offlinePlayer.getName();
+                    }
+                }
+                
+                // Fallback to UUID if name not found
+                if (playerName == null) {
+                    playerName = entry.getPlayerId().toString().substring(0, 8) + "...";
+                }
+                
+                // Format rank with medal emojis for top 3
+                String rankDisplay;
+                if (rank == 1) {
+                    rankDisplay = ChatColor.GOLD + "🥇 #1";
+                } else if (rank == 2) {
+                    rankDisplay = ChatColor.GRAY + "🥈 #2";
+                } else if (rank == 3) {
+                    rankDisplay = ChatColor.GOLD + "🥉 #3";
+                } else {
+                    rankDisplay = ChatColor.GRAY + "#" + rank;
+                }
+                
+                // Check if this is the viewing player
+                boolean isViewingPlayer = entry.getPlayerId().equals(player.getUniqueId());
+                ChatColor nameColor = isViewingPlayer ? ChatColor.YELLOW : ChatColor.WHITE;
+                
+                String line = rankDisplay + " " + nameColor + playerName + " " 
+                            + ChatColor.GRAY + "- " + skillColor + "Level " + entry.getLevel() 
+                            + ChatColor.GRAY + " (" + String.format("%.0f", entry.getExperience()) + " XP)";
+                
+                player.sendMessage(line);
+            }
+            
+            player.sendMessage("");
+            
+        } catch (Exception e) {
+            plugin.getLogger().warning("Error sending leaderboard to player " + player.getName() + ": " + e.getMessage());
+            player.sendMessage(ChatColor.RED + "An error occurred while displaying the leaderboard.");
+        }
+    }
+    
+    /**
      * Sends a formatted overview of all the player's skills.
      * 
      * @param player The player to send the overview to

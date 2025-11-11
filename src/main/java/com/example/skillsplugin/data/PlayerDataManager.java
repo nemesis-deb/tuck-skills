@@ -257,6 +257,67 @@ public class PlayerDataManager {
     }
     
     /**
+     * Gets the top players for a specific skill.
+     * Returns a list of LeaderboardEntry objects sorted by level (descending) and XP (descending).
+     * 
+     * @param skillType The skill type to get leaderboard for
+     * @param limit Maximum number of entries to return
+     * @return Array of leaderboard entries
+     */
+    public LeaderboardEntry[] getTopPlayers(SkillType skillType, int limit) {
+        try {
+            UUID[] allPlayerIds = dataStorage.getAllPlayerIds();
+            
+            if (allPlayerIds.length == 0) {
+                return new LeaderboardEntry[0];
+            }
+            
+            // Load all profiles and extract skill data
+            java.util.List<LeaderboardEntry> entries = new java.util.ArrayList<>();
+            
+            for (UUID playerId : allPlayerIds) {
+                try {
+                    SkillProfile profile = getProfile(playerId);
+                    if (profile != null) {
+                        Skill skill = profile.getSkill(skillType);
+                        if (skill != null) {
+                            entries.add(new LeaderboardEntry(
+                                playerId,
+                                skill.getLevel(),
+                                skill.getExperience()
+                            ));
+                        }
+                    }
+                } catch (Exception e) {
+                    plugin.getLogger().log(Level.WARNING, "Failed to load profile for leaderboard: " + playerId, e);
+                }
+            }
+            
+            // Sort by level (descending), then by XP (descending)
+            entries.sort((a, b) -> {
+                int levelCompare = Integer.compare(b.getLevel(), a.getLevel());
+                if (levelCompare != 0) {
+                    return levelCompare;
+                }
+                return Double.compare(b.getExperience(), a.getExperience());
+            });
+            
+            // Limit results
+            int resultSize = Math.min(limit, entries.size());
+            LeaderboardEntry[] result = new LeaderboardEntry[resultSize];
+            for (int i = 0; i < resultSize; i++) {
+                result[i] = entries.get(i);
+            }
+            
+            return result;
+            
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Error getting top players for " + skillType, e);
+            return new LeaderboardEntry[0];
+        }
+    }
+    
+    /**
      * Clears all profiles from the cache without saving.
      * Should only be used for testing or emergency situations.
      */
@@ -295,6 +356,33 @@ public class PlayerDataManager {
         
         public boolean isLeveledUp() {
             return leveledUp;
+        }
+    }
+    
+    /**
+     * Leaderboard entry containing player information and skill stats.
+     */
+    public static class LeaderboardEntry {
+        private final UUID playerId;
+        private final int level;
+        private final double experience;
+        
+        public LeaderboardEntry(UUID playerId, int level, double experience) {
+            this.playerId = playerId;
+            this.level = level;
+            this.experience = experience;
+        }
+        
+        public UUID getPlayerId() {
+            return playerId;
+        }
+        
+        public int getLevel() {
+            return level;
+        }
+        
+        public double getExperience() {
+            return experience;
         }
     }
 }

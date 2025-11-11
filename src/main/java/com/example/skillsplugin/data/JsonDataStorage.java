@@ -268,4 +268,40 @@ public class JsonDataStorage implements DataStorage {
     private File getPlayerFile(UUID playerId) {
         return new File(dataDirectory, playerId.toString() + ".json");
     }
+    
+    @Override
+    public UUID[] getAllPlayerIds() throws DataStorageException {
+        try {
+            File[] files = dataDirectory.listFiles((dir, name) -> name.endsWith(".json") && !name.endsWith(".bak"));
+            
+            if (files == null || files.length == 0) {
+                return new UUID[0];
+            }
+            
+            UUID[] playerIds = new UUID[files.length];
+            int validCount = 0;
+            
+            for (File file : files) {
+                try {
+                    String fileName = file.getName();
+                    String uuidString = fileName.substring(0, fileName.length() - 5); // Remove .json
+                    playerIds[validCount++] = UUID.fromString(uuidString);
+                } catch (IllegalArgumentException e) {
+                    // Skip invalid UUID files
+                }
+            }
+            
+            // Return array with only valid UUIDs
+            if (validCount < playerIds.length) {
+                UUID[] result = new UUID[validCount];
+                System.arraycopy(playerIds, 0, result, 0, validCount);
+                return result;
+            }
+            
+            return playerIds;
+            
+        } catch (Exception e) {
+            throw new DataStorageException("Failed to get all player IDs", e);
+        }
+    }
 }

@@ -7,10 +7,11 @@ description: A comprehensive skill leveling system
 
 commands:
   skills:
-    description: View your skills or display skill level in your name
+    description: View your skills, leaderboards, or display skill level in your name
     usage: |
       /skills - View all skills
       /skills <skillname> - View specific skill details
+      /skills top <skillname> - View top 10 players for a skill
       /skills display <skillname> - Display skill level in your name
       /skills display off - Remove skill display from name
       /skills reload - Reload configuration
