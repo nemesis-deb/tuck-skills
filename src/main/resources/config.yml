@@ -18,13 +18,14 @@ experience:
 # Higher exponent = exponential difficulty increase
 # Recommended exponent values:
 #   1.0 = Linear (same XP per level)
-#   1.2 = Gentle curve (recommended for casual servers)
-#   1.3 = Moderate curve (balanced)
-#   1.5 = Steep curve (hardcore servers)
-#   2.0 = Very steep (extreme difficulty)
+#   1.2 = Gentle curve (casual servers)
+#   1.25 = Moderate curve (balanced, default)
+#   1.3 = Steeper curve (competitive servers)
+#   1.5 = Very steep (hardcore servers)
+#   2.0 = Extreme difficulty
 leveling:
   base-xp: 100.0
-  exponent: 1.2
+  exponent: 1.25
 
 # Skill bonuses configuration
 bonuses:

@@ -71,19 +71,20 @@ The XP required per level is calculated using: `baseXP * (level ^ exponent)`
 
 **Exponent values and their effects:**
 - `1.0` = Linear (100 XP per level, very easy)
-- `1.2` = Gentle curve (default, balanced for most servers)
-- `1.3` = Moderate curve (slightly harder)
-- `1.5` = Steep curve (hardcore servers)
-- `2.0` = Very steep (extreme difficulty)
+- `1.2` = Gentle curve (casual servers)
+- `1.25` = Moderate curve (default, balanced)
+- `1.3` = Steeper curve (competitive servers)
+- `1.5` = Very steep (hardcore servers)
+- `2.0` = Extreme difficulty
 
 **Example XP requirements with different exponents:**
 
-| Level | Exponent 1.2 | Exponent 1.5 | Exponent 2.0 |
-|-------|--------------|--------------|--------------|
-| 1→2   | 100 XP       | 100 XP       | 100 XP       |
-| 10→11 | 251 XP       | 3,162 XP     | 10,000 XP    |
-| 20→21 | 464 XP       | 8,944 XP     | 40,000 XP    |
-| 50→51 | 1,096 XP     | 35,355 XP    | 250,000 XP   |
+| Level | Exponent 1.2 | Exponent 1.25 | Exponent 1.3 | Exponent 1.5 |
+|-------|--------------|---------------|--------------|--------------|
+| 1→2   | 100 XP       | 100 XP        | 100 XP       | 100 XP       |
+| 10→11 | 251 XP       | 298 XP        | 355 XP       | 3,162 XP     |
+| 20→21 | 464 XP       | 595 XP        | 764 XP       | 8,944 XP     |
+| 50→51 | 1,096 XP     | 1,778 XP      | 2,885 XP     | 35,355 XP    |
 
 ### Other Settings
 
