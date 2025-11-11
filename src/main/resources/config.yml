@@ -16,9 +16,15 @@ experience:
 # Formula: baseXP * (level ^ exponent)
 # Higher base-xp = slower leveling overall
 # Higher exponent = exponential difficulty increase
+# Recommended exponent values:
+#   1.0 = Linear (same XP per level)
+#   1.2 = Gentle curve (recommended for casual servers)
+#   1.3 = Moderate curve (balanced)
+#   1.5 = Steep curve (hardcore servers)
+#   2.0 = Very steep (extreme difficulty)
 leveling:
   base-xp: 100.0
-  exponent: 1.5
+  exponent: 1.2
 
 # Skill bonuses configuration
 bonuses:

@@ -12,7 +12,7 @@ public class LevelFormula {
     
     // Default values if config is not available
     private static final double DEFAULT_BASE_XP = 100.0;
-    private static final double DEFAULT_EXPONENT = 1.5;
+    private static final double DEFAULT_EXPONENT = 1.2;
     
     /**
      * Creates a LevelFormula with a ConfigManager for dynamic configuration.

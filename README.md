@@ -61,6 +61,37 @@ The build process:
 - `skills.use` - Allows using the skills command (default: true)
 - `skills.reload` - Allows reloading the config (default: op)
 
+## Configuration
+
+The plugin is highly configurable through `plugins/SkillsPlugin/config.yml`.
+
+### Leveling Difficulty
+
+The XP required per level is calculated using: `baseXP * (level ^ exponent)`
+
+**Exponent values and their effects:**
+- `1.0` = Linear (100 XP per level, very easy)
+- `1.2` = Gentle curve (default, balanced for most servers)
+- `1.3` = Moderate curve (slightly harder)
+- `1.5` = Steep curve (hardcore servers)
+- `2.0` = Very steep (extreme difficulty)
+
+**Example XP requirements with different exponents:**
+
+| Level | Exponent 1.2 | Exponent 1.5 | Exponent 2.0 |
+|-------|--------------|--------------|--------------|
+| 1→2   | 100 XP       | 100 XP       | 100 XP       |
+| 10→11 | 251 XP       | 3,162 XP     | 10,000 XP    |
+| 20→21 | 464 XP       | 8,944 XP     | 40,000 XP    |
+| 50→51 | 1,096 XP     | 35,355 XP    | 250,000 XP   |
+
+### Other Settings
+
+- **XP Multipliers**: Adjust XP gain per skill (1.0 = normal, 2.0 = double XP)
+- **Skill Bonuses**: Configure bonus percentages for each skill
+- **UI Settings**: Customize boss bar duration and XP messages
+- **Enabled Skills**: Enable/disable specific skills
+
 ## Requirements
 
 - Java 17 or higher
