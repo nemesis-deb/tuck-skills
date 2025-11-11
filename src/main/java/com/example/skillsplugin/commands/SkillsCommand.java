@@ -63,6 +63,11 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             
+            // Handle /skills display <skillname> or /skills display off
+            if (args.length >= 2 && args[0].equalsIgnoreCase("display")) {
+                return handleDisplay(player, args[1]);
+            }
+            
             // Get player's skill profile
             SkillProfile profile;
             try {
@@ -152,6 +157,69 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
     }
     
     /**
+     * Handles the /skills display <skillname> subcommand.
+     * Changes the player's display name to show their skill level.
+     * 
+     * @param player The player executing the command
+     * @param skillArg The skill name or "off" to remove display
+     * @return true if the command was handled successfully
+     */
+    private boolean handleDisplay(Player player, String skillArg) {
+        try {
+            // Handle /skills display off
+            if (skillArg.equalsIgnoreCase("off") || skillArg.equalsIgnoreCase("none")) {
+                player.setDisplayName(player.getName());
+                player.setPlayerListName(player.getName());
+                player.sendMessage(ChatColor.GREEN + "Skill display removed from your name.");
+                return true;
+            }
+            
+            // Get player's skill profile
+            SkillProfile profile;
+            try {
+                profile = playerDataManager.getProfile(player.getUniqueId());
+                if (profile == null) {
+                    player.sendMessage(ChatColor.RED + "Failed to load your skill profile. Please try again.");
+                    return true;
+                }
+            } catch (Exception e) {
+                player.sendMessage(ChatColor.RED + "An error occurred while loading your skills.");
+                plugin.getLogger().severe("Error loading profile for player " + player.getName() + ": " + e.getMessage());
+                return true;
+            }
+            
+            // Parse skill type
+            String skillName = skillArg.toUpperCase();
+            try {
+                SkillType skillType = SkillType.valueOf(skillName);
+                Skill skill = profile.getSkill(skillType);
+                
+                if (skill == null) {
+                    player.sendMessage(ChatColor.RED + "Skill not found: " + skillName);
+                    return true;
+                }
+                
+                // Update display name with skill badge
+                uiManager.setSkillDisplayName(player, skill);
+                player.sendMessage(ChatColor.GREEN + "Your name now displays your " + skillType.name() + " level!");
+                return true;
+                
+            } catch (IllegalArgumentException e) {
+                player.sendMessage(ChatColor.RED + "Unknown skill: " + skillArg);
+                player.sendMessage(ChatColor.GRAY + "Available skills: " + getSkillNamesList());
+                player.sendMessage(ChatColor.GRAY + "Use 'off' to remove skill display");
+                return true;
+            }
+            
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + "An unexpected error occurred.");
+            plugin.getLogger().severe("Error in display command: " + e.getMessage());
+            e.printStackTrace();
+            return true;
+        }
+    }
+    
+    /**
      * Gets a comma-separated list of all skill names.
      * 
      * @return A string with all skill names
@@ -168,7 +236,7 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
         try {
             List<String> completions = new ArrayList<>();
             
-            // First argument: skill names or "reload"
+            // First argument: skill names, "reload", or "display"
             if (args.length == 1) {
                 // Add all skill names
                 for (SkillType skillType : SkillType.values()) {
@@ -180,8 +248,28 @@ public class SkillsCommand implements CommandExecutor, TabCompleter {
                     completions.add("reload");
                 }
                 
+                // Add display subcommand
+                completions.add("display");
+                
                 // Filter based on what the user has typed
                 String input = args[0].toLowerCase();
+                return completions.stream()
+                        .filter(s -> s.startsWith(input))
+                        .collect(Collectors.toList());
+            }
+            
+            // Second argument for /skills display <skillname>
+            if (args.length == 2 && args[0].equalsIgnoreCase("display")) {
+                // Add all skill names
+                for (SkillType skillType : SkillType.values()) {
+                    completions.add(skillType.name().toLowerCase());
+                }
+                
+                // Add "off" option
+                completions.add("off");
+                
+                // Filter based on what the user has typed
+                String input = args[1].toLowerCase();
                 return completions.stream()
                         .filter(s -> s.startsWith(input))
                         .collect(Collectors.toList());

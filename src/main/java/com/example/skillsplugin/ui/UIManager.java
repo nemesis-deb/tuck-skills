@@ -184,6 +184,41 @@ public class UIManager {
     }
     
     /**
+     * Sets the player's display name to show their skill level.
+     * Format: [icon level] PlayerName
+     * 
+     * @param player The player whose display name to update
+     * @param skill The skill to display
+     */
+    public void setSkillDisplayName(Player player, Skill skill) {
+        try {
+            if (player == null || !player.isOnline()) {
+                return;
+            }
+            
+            if (skill == null) {
+                plugin.getLogger().warning("Attempted to set display name with null skill for player " + player.getName());
+                return;
+            }
+            
+            SkillType type = skill.getType();
+            int level = skill.getLevel();
+            ChatColor skillColor = getChatColorForSkill(type);
+            String skillIcon = getIconForSkill(type);
+            
+            // Create the display name: [icon level] PlayerName
+            String displayName = ChatColor.GRAY + "[" + skillColor + skillIcon + " " + level + ChatColor.GRAY + "] " 
+                               + ChatColor.WHITE + player.getName();
+            
+            player.setDisplayName(displayName);
+            player.setPlayerListName(displayName);
+            
+        } catch (Exception e) {
+            plugin.getLogger().warning("Error setting skill display name for player " + player.getName() + ": " + e.getMessage());
+        }
+    }
+    
+    /**
      * Sends detailed information about a specific skill including progress bar.
      * 
      * @param player The player to send the details to

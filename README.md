@@ -51,6 +51,8 @@ The build process:
 
 - `/skills` - View all your skills
 - `/skills <skillname>` - View details for a specific skill
+- `/skills display <skillname>` - Display your skill level in your name (e.g., `[⛏ 15] PlayerName`)
+- `/skills display off` - Remove skill display from your name
 - `/skills reload` - Reload the configuration (requires `skills.reload` permission)
 
 ## Permissions
