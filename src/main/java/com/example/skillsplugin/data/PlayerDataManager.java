@@ -223,6 +223,9 @@ public class PlayerDataManager {
         int newLevel = skill.getLevel();
         int levelsGained = newLevel - oldLevel;
         
+        // Track the last skill that gained XP
+        profile.setLastSkillXP(skillType);
+        
         return new ExperienceResult(skillType, amount, levelsGained, leveledUp);
     }
     

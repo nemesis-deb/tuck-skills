@@ -13,6 +13,7 @@ public class SkillProfile {
     private final Map<SkillType, Skill> skills;
     private boolean isNew;
     private SkillType displayedSkill; // The skill currently displayed in player's name
+    private SkillType lastSkillXP; // The skill that most recently gained XP
     
     /**
      * Creates a new skill profile for a player with all skills initialized at level 1.
@@ -116,5 +117,23 @@ public class SkillProfile {
      */
     public void setDisplayedSkill(SkillType skillType) {
         this.displayedSkill = skillType;
+    }
+    
+    /**
+     * Gets the skill type that most recently gained XP.
+     * 
+     * @return The last skill that gained XP, or null if no skill has gained XP yet
+     */
+    public SkillType getLastSkillXP() {
+        return lastSkillXP;
+    }
+    
+    /**
+     * Sets the skill type that most recently gained XP.
+     * 
+     * @param skillType The skill type that gained XP
+     */
+    public void setLastSkillXP(SkillType skillType) {
+        this.lastSkillXP = skillType;
     }
 }
